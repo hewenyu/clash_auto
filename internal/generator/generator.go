@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/hewenyu/clash_auto/internal/types"
 	"gopkg.in/yaml.v3"
@@ -55,8 +56,19 @@ func GenerateConfig(templatePath, outputPath string, proxies []types.Proxy, addi
 		return fmt.Errorf("failed to create output directory: %w", err)
 	}
 
-	// 9. Write to output file
-	if err := os.WriteFile(outputPath, buf.Bytes(), 0644); err != nil {
+	// 9. Post-process the output to un-escape unicode characters
+	// The yaml encoder escapes emojis, so we un-escape them manually.
+	// We add quotes around the buffer content to make it a valid Go string literal.
+	quoted := `"` + string(buf.Bytes()) + `"`
+	unquoted, err := strconv.Unquote(quoted)
+	if err != nil {
+		// If unquoting fails, fall back to the original buffer.
+		unquoted = string(buf.Bytes())
+	}
+	// Unquote removes the outer quotes, so we get the clean string.
+
+	// 10. Write to output file
+	if err := os.WriteFile(outputPath, []byte(unquoted), 0644); err != nil {
 		return fmt.Errorf("failed to write final config file: %w", err)
 	}
 
