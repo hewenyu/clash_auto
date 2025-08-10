@@ -3,21 +3,22 @@ package parser
 import (
 	"fmt"
 
+	"github.com/hewenyu/clash_auto/internal/types"
 	"gopkg.in/yaml.v3"
 )
 
 // Parse decodes subscription content and extracts a list of proxy and rule definitions.
-func Parse(data []byte) ([]map[string]interface{}, []string, error) {
+func Parse(data []byte) ([]types.Proxy, []string, error) {
 	var subscription struct {
-		Proxies []map[string]interface{} `yaml:"proxies"`
-		Rules   []string                 `yaml:"rules"`
+		Proxies []types.Proxy `yaml:"proxies"`
+		Rules   []string      `yaml:"rules"`
 	}
 
 	err := yaml.Unmarshal(data, &subscription)
 	if err != nil {
 		// Attempt to parse only proxies if the full structure fails
 		var proxiesOnly struct {
-			Proxies []map[string]interface{} `yaml:"proxies"`
+			Proxies []types.Proxy `yaml:"proxies"`
 		}
 		if yaml.Unmarshal(data, &proxiesOnly) == nil {
 			return proxiesOnly.Proxies, nil, nil

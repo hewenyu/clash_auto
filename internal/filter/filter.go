@@ -2,12 +2,14 @@ package filter
 
 import (
 	"strings"
+
+	"github.com/hewenyu/clash_auto/internal/types"
 )
 
 // FilterProxies filters a list of proxy definitions based on include keywords.
 // It checks if the proxy's name contains any of the keywords.
-func FilterProxies(proxies []map[string]interface{}, keywords []string) []map[string]interface{} {
-	var filteredProxies []map[string]interface{}
+func FilterProxies(proxies []types.Proxy, keywords []string) []types.Proxy {
+	var filteredProxies []types.Proxy
 
 	if len(keywords) == 0 {
 		return proxies

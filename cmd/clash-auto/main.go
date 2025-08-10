@@ -9,6 +9,7 @@ import (
 	"github.com/hewenyu/clash_auto/internal/filter"
 	"github.com/hewenyu/clash_auto/internal/generator"
 	"github.com/hewenyu/clash_auto/internal/parser"
+	"github.com/hewenyu/clash_auto/internal/types"
 )
 
 func main() {
@@ -23,7 +24,7 @@ func main() {
 	log.Println("Configuration loaded successfully.")
 
 	// 2. Download and parse all subscriptions
-	var allProxies []map[string]interface{}
+	var allProxies []types.Proxy
 	var allRules []string
 	for _, subURL := range cfg.Subscriptions {
 		log.Printf("Downloading subscription from: %s", subURL)
