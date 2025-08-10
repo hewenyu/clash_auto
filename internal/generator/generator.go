@@ -59,7 +59,7 @@ func GenerateConfig(templatePath, outputPath string, proxies []types.Proxy, addi
 
 	// 9. Post-process the output to un-escape unicode characters
 	// The yaml encoder escapes emojis and other Unicode characters, so we replace them manually.
-	result := replaceUnicodeEscapes(string(buf.Bytes()))
+	result := replaceUnicodeEscapes(buf.String())
 
 	// 10. Write to output file
 	if err := os.WriteFile(outputPath, []byte(result), 0644); err != nil {
