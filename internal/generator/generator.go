@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 
 	"github.com/hewenyu/clash_auto/internal/types"
@@ -57,18 +58,11 @@ func GenerateConfig(templatePath, outputPath string, proxies []types.Proxy, addi
 	}
 
 	// 9. Post-process the output to un-escape unicode characters
-	// The yaml encoder escapes emojis, so we un-escape them manually.
-	// We add quotes around the buffer content to make it a valid Go string literal.
-	quoted := `"` + string(buf.Bytes()) + `"`
-	unquoted, err := strconv.Unquote(quoted)
-	if err != nil {
-		// If unquoting fails, fall back to the original buffer.
-		unquoted = string(buf.Bytes())
-	}
-	// Unquote removes the outer quotes, so we get the clean string.
+	// The yaml encoder escapes emojis and other Unicode characters, so we replace them manually.
+	result := replaceUnicodeEscapes(string(buf.Bytes()))
 
 	// 10. Write to output file
-	if err := os.WriteFile(outputPath, []byte(unquoted), 0644); err != nil {
+	if err := os.WriteFile(outputPath, []byte(result), 0644); err != nil {
 		return fmt.Errorf("failed to write final config file: %w", err)
 	}
 
@@ -111,4 +105,29 @@ func mergeRules(templateRules []string, additionalRules []string) []string {
 	}
 
 	return finalRules
+}
+
+// replaceUnicodeEscapes replaces Unicode escape sequences like \U0001F1E8 and \u0065 with actual Unicode characters.
+func replaceUnicodeEscapes(s string) string {
+	// Find all Unicode escape sequences like \U0001F1E8 (8 hex digits)
+	re8 := regexp.MustCompile(`\\U([0-9A-Fa-f]{8})`)
+	s = re8.ReplaceAllStringFunc(s, func(match string) string {
+		hex := match[2:] // Remove \U prefix
+		if codePoint, err := strconv.ParseInt(hex, 16, 64); err == nil {
+			return string(rune(codePoint))
+		}
+		return match
+	})
+
+	// Find all Unicode escape sequences like \u0065 (4 hex digits)
+	re4 := regexp.MustCompile(`\\u([0-9A-Fa-f]{4})`)
+	s = re4.ReplaceAllStringFunc(s, func(match string) string {
+		hex := match[2:] // Remove \u prefix
+		if codePoint, err := strconv.ParseInt(hex, 16, 64); err == nil {
+			return string(rune(codePoint))
+		}
+		return match
+	})
+
+	return s
 }
