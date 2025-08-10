@@ -1,0 +1,26 @@
+# This is an example configuration file for Clash Auto.
+# Rename this file to config.yaml and fill in your details.
+
+# List of subscription URLs to fetch.
+# The subscriptions should provide proxies in Clash YAML format.
+subscriptions:
+  - "https://your-subscription-url.com/sub1.yaml"
+  - "https://your-subscription-url.com/sub2.yaml"
+
+# Rules for filtering proxies.
+# Proxies whose names contain any of these keywords (case-insensitive) will be included.
+filter_rules:
+  include_keywords:
+    - "HK"
+    - "香港"
+    - "SG"
+    - "新加坡"
+    - "JP"
+    - "日本"
+    - "US"
+
+# Path to the base Clash template file.
+template_path: "./config/template.yaml"
+
+# Path for the final generated config file.
+output_path: "./dist/config.yaml"

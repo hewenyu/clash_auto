@@ -1,0 +1,33 @@
+# Basic Clash configuration template
+
+port: 7890
+socks-port: 7891
+allow-lan: true
+mode: rule
+log-level: info
+external-controller: '127.0.0.1:9090'
+
+# Proxies will be inserted here by the script.
+# proxies:
+#   - name: ...
+
+# Proxy groups will be updated by the script.
+proxy-groups:
+  - name: "线路选择"
+    type: select
+    # Filtered proxies will be inserted here by the script
+    proxies:
+      - DIRECT
+
+  - name: "其他网域"
+    type: select
+    proxies:
+      - 线路选择
+      - DIRECT
+
+# Rules
+rules:
+  - "DOMAIN-SUFFIX,google.com,其他网域"
+  - "DOMAIN-KEYWORD,google,其他网域"
+  - "DOMAIN-SUFFIX,github.com,DIRECT"
+  - "MATCH,其他网域"
